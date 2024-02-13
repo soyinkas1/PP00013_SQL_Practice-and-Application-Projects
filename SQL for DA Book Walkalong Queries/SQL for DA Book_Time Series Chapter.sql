@@ -17,3 +17,33 @@ DELIMITER ','
 CSV HEADER
 ;
 SELECT * FROM retail_sales;
+
+-- Trend of total retail and food services sales in the US
+
+SELECT
+	sales_month,
+	sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+;
+
+-- Transform and aggregate at the yearly level to remove noise and gain better understanding
+SELECT
+	date_part('year', sales_month) as sales_year,
+	sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business = 'Retail and food services sales, total'
+GROUP BY 1
+ORDER BY sales_year
+;
+
+-- Compare the yearly sales trend for a few categories that are associated with leisure activities
+SELECT
+	date_part('year',sales_month) as sales_year,
+	kind_of_business,
+	sum(sales) as sales
+FROM retail_sales
+WHERE kind_of_business in ('Book stores', 'Sporting goods stores', 'Hobby, toy, and game stores')
+GROUP BY 1, 2
+ORDER BY 1
+;
