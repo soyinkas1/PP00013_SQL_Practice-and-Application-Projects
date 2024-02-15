@@ -48,5 +48,10 @@ SELECT payment_date,
     sum(CASE WHEN rental_id = 1476 THEN amount else 0 END) as rental_1476
 FROM payment
 GROUP BY 1;
+
+SELECT date_format(current_timestamp, '%H');
+
+SELECT datediff(date('2020-06-30'), date('2020-05-31')) as days;
+SELECT date('2020-06-30');
 		
 
