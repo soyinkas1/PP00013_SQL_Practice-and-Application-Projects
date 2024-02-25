@@ -1,0 +1,17 @@
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.txt filter=lfs diff=lfs merge=lfs -text
+*/data/*.txt filter=lfs diff=lfs merge=lfs -text
+PDP[[:space:]]Database[[:space:]]SQL[[:space:]]Analysis_CPD[[:space:]]Projects_01/data/PDP21Results.txt filter=lfs diff=lfs merge=lfs -text
+/Database[[:space:]]SQL[[:space:]]Analysis_CPD[[:space:]]Projects_01/data/PDP21Results.txt filter=lfs diff=lfs merge=lfs -text
+SQL filter=lfs diff=lfs merge=lfs -text
+SCIENCE/SQL/PP00013_SQL filter=lfs diff=lfs merge=lfs -text
+CPD filter=lfs diff=lfs merge=lfs -text
+Database filter=lfs diff=lfs merge=lfs -text
+Analysis_CPD filter=lfs diff=lfs merge=lfs -text
+Pr filter=lfs diff=lfs merge=lfs -text
+D:/OneDrive/Documents/PERSONAL/PERSONAL filter=lfs diff=lfs merge=lfs -text
+Projects_01/data/PDP21Results.txt filter=lfs diff=lfs merge=lfs -text
+PDP filter=lfs diff=lfs merge=lfs -text
+Projects_01/data/PDP21Samples.txt filter=lfs diff=lfs merge=lfs -text
+PDP[[:space:]]Database[[:space:]]SQL[[:space:]]Analysis_CPD[[:space:]]Projects_01/data/PDP21Samples.txt filter=lfs diff=lfs merge=lfs -text
+*/data*.txt filter=lfs diff=lfs merge=lfs -text
