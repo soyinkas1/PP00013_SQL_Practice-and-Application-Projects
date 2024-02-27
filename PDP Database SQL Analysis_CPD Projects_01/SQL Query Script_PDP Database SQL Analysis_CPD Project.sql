@@ -188,18 +188,21 @@ SELECT DISTINCT `Lab Agency Name` as Lab_Name, `Lab City/State` as Location  FRO
 	pdp_results T JOIN lab_code L on T.LAB = L.`Lab Code`;
   
 -- Fetch the commodity results from each Lab with their location
-SELECT DISTINCT `Country Name` as Country_Name, COUNTRY as Country_Code, `Commodity Name` as Commodity 
-FROM pdp_samples LEFT JOIN country_code ON pdp_samples.COUNTRY = country_code.`Country Code` 
-	JOIN pdp_results ON pdp_samples.SAMPLE_PK = pdp_results.SAMPLE_PK
-		JOIN commodity_code ON pdp_results.COMMOD = commodity_code.`Commodity Code`
-			ORDER BY Country_Code ; 
+SELECT DISTINCT `Lab Agency Name` as lab_Name, `Lab City/State` as Location, `Commodity Name` as Commodity 
+FROM pdp_results LEFT JOIN commodity_code ON pdp_results.COMMOD = commodity_code.`Commodity Code` 
+	JOIN lab_code L on pdp_results.LAB = L.`Lab Code`
+		ORDER BY lab_name ; 
     
 -- Count of results from each lab from highest to lowest
-SELECT `Country Name` as Country_Name, count(COUNTRY) as Number_of_Results FROM 
-	pdp_samples JOIN country_code on pdp_samples.COUNTRY = country_code.`Country Code`
-    JOIN pdp_results ON pdp_samples.SAMPLE_PK = pdp_results.SAMPLE_PK
-		GROUP BY `Country Name`
-			ORDER BY Number_of_Results DESC;
+SELECT DISTINCT 
+	`Lab Agency Name` as lab_Name, 
+    `Lab City/State` as Location, 
+    `Commodity Name` as Commodity, 
+    COUNT(COMMOD) OVER (PARTITION BY `Lab Code`) as Total_Per_Lab,
+    COUNT(COMMOD) OVER (PARTITION BY COMMOD) as Total_Per_Commodity
+FROM pdp_results LEFT JOIN commodity_code ON pdp_results.COMMOD = commodity_code.`Commodity Code` 
+	JOIN lab_code L on pdp_results.LAB = L.`Lab Code`
+		ORDER BY lab_name, Total_Per_Commodity DESC ;
             
 -- Fetch the commodity type of each commodities with test results
 
