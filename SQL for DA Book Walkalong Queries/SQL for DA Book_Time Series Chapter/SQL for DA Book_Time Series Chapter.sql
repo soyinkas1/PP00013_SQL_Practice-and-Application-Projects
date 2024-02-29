@@ -40,8 +40,12 @@ SELECT date('2020-01-01') + interval '8 months' as new_date;
 
 --Time maths
 SELECT time '05:00' + interval '3 hours' as new_time;
-SELECT time '03:00' - time '01:00' as time_diff;
-SELECT time '05:00' * 2 as more_time;
+SELECT time '03:00' - time '01:00' as time_diff; -- we can substract times resulting in interval
+SELECT time '05:00' * 2 as more_time; -- time unlike dates can be multiplied
+SELECT interval '1 second' * 2000 as interval_multipled; -- Intervals can be multipled, resulting in time value
+SELECT interval '1 day' * 45 as interval_multiplied;
+
+
  
 -- Trend of total retail and food services sales in the US
 
@@ -138,4 +142,72 @@ WHERE kind_of_business in ('Women''s clothing stores',
 						  and sales_month <= '2019-12-01'
 GROUP BY 1
 ORDER BY 1
+;
+
+-- Calculate the ratios of the categories using the men's sales as the baseline or denominator
+SELECT 
+	sales_year,
+	ROUND(womens_sales / mens_sales, 2) as womens_times_of_mens
+FROM
+	(
+		SELECT date_part('year', sales_month) as sales_year,
+		sum(case when kind_of_business = 'Women''s clothing stores' then sales end) as womens_sales,
+		sum(case when kind_of_business = 'Men''s clothing stores' then sales end) as mens_sales
+		FROM retail_sales
+		WHERE kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
+			and sales_month <= '2019-12-01'
+		GROUP BY 1
+		ORDER BY 1
+		
+	) a
+	;
+
+-- Percentage difference between sales at women's and men's clothing stores
+SELECT 
+	sales_year,
+	ROUND((womens_sales / mens_sales-1) * 100, 2) as womens_pct_of_mens
+FROM
+	(
+		SELECT date_part('year', sales_month) as sales_year,
+		sum(case when kind_of_business = 'Women''s clothing stores' then sales end) as womens_sales,
+		sum(case when kind_of_business = 'Men''s clothing stores' then sales end) as mens_sales
+		FROM retail_sales
+		WHERE kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
+			and sales_month <= '2019-12-01'
+		GROUP BY 1
+		ORDER BY 1
+		
+	) a
+	;
+	
+-- Percent of Total Calculations
+  -- Self-Joins
+SELECT 
+  	sales_month,
+	kind_of_business,
+	sales * 100 / total_sales as pct_total_sales
+FROM 
+	(
+		SELECT a.sales_month, a.kind_of_business, a.sales, 
+		sum(b.sales) as total_sales
+		FROM retail_sales a
+		JOIN retail_sales b on a.sales_month = b.sales_month
+		and b.kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
+		WHERE a.kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
+		GROUP BY 1,2,3
+		
+	
+	) aa
+	ORDER BY 1
+	;
+	
+	-- window function
+SELECT
+	sales_month, 
+	kind_of_business,
+	sales,
+	sum(sales) OVER (PARTITION BY sales_month) as total_sales,
+	sales * 100 / SUM(sales) OVER (PARTITION BY sales_month) as pct_total
+FROM retail_sales
+WHERE kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
 ;
