@@ -9,8 +9,87 @@
 -- FIELDS TERMINATED BY ','
 -- IGNORE 1 ROWS;
 
-
-
+-- View all the tables
+-- 1. annotate code table
+SELECT 
+    *
+FROM
+    `annotate code`;
+-- 2. commodity_code table
+SELECT 
+    *
+FROM
+    commodity_code;
+-- 3. commodity_type_code table
+SELECT 
+    *
+FROM
+    commodity_type_code;
+-- 4. concentration-iod_unit_code table
+SELECT 
+    *
+FROM
+    `concentration-lod_unit_code`;
+-- 5. confirmation_method_code table
+SELECT 
+    *
+FROM
+    confirmation_method_code;
+-- 6. country_code table
+SELECT 
+    *
+FROM
+    country_code;
+-- 7. determinative_method_code table
+SELECT 
+    *
+FROM
+    determinative_method_code;
+-- 8. distribution_type_code table
+SELECT 
+    *
+FROM
+    distribution_type_code;
+-- 9 extract_code table
+SELECT 
+    *
+FROM
+    extract_code;
+-- 10. lab_code table
+SELECT 
+    *
+FROM
+    lab_code;
+-- 11. marketing_claim_code table
+SELECT 
+    *
+FROM
+    marketing_claim_code;
+-- 12. mean_code table
+SELECT 
+    *
+FROM
+    mean_code;
+-- 13. origin_code table
+SELECT 
+    *
+FROM
+    origin_code;
+-- 14. quantitation_code table
+SELECT 
+    *
+FROM
+    quantitation_code;
+-- 15. state_code
+SELECT 
+    *
+FROM
+    state_code;
+-- 16. test_class_code
+SELECT 
+    *
+FROM
+    test_class_code;
 
 SELECT 
     COUNT(*) AS number_of_samples
@@ -139,88 +218,6 @@ WHERE
 GROUP BY `COMMODITY NAME`
 ORDER BY Samples DESC;
     
--- View all the tables
--- 1. annotate code table
-SELECT 
-    *
-FROM
-    `annotate code`;
--- 2. commodity_code table
-SELECT 
-    *
-FROM
-    commodity_code;
--- 3. commodity_type_code table
-SELECT 
-    *
-FROM
-    commodity_type_code;
--- 4. concentration-iod_unit_code table
-SELECT 
-    *
-FROM
-    `concentration-lod_unit_code`;
--- 5. confirmation_method_code table
-SELECT 
-    *
-FROM
-    confirmation_method_code;
--- 6. country_code table
-SELECT 
-    *
-FROM
-    country_code;
--- 7. determinative_method_code table
-SELECT 
-    *
-FROM
-    determinative_method_code;
--- 8. distribution_type_code table
-SELECT 
-    *
-FROM
-    distribution_type_code;
--- 9 extract_code table
-SELECT 
-    *
-FROM
-    extract_code;
--- 10. lab_code table
-SELECT 
-    *
-FROM
-    lab_code;
--- 11. marketing_claim_code table
-SELECT 
-    *
-FROM
-    marketing_claim_code;
--- 12. mean_code table
-SELECT 
-    *
-FROM
-    mean_code;
--- 13. origin_code table
-SELECT 
-    *
-FROM
-    origin_code;
--- 14. quantitation_code table
-SELECT 
-    *
-FROM
-    quantitation_code;
--- 15. state_code
-SELECT 
-    *
-FROM
-    state_code;
--- 16. test_class_code
-SELECT 
-    *
-FROM
-    test_class_code;
-
 -- Fetch the Concentration/LOD units to confirm if uniform
 SELECT DISTINCT
     `CONUNIT`
