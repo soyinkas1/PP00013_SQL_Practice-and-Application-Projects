@@ -43,11 +43,15 @@ FROM
 
 -- Fetch the distint countries from which samples was collected and number of samples
 SELECT DISTINCT
-    `Country Name` AS Country_Name, COUNTRY AS Country_Code
+    `Country Name` AS Country_Name, 
+    COUNTRY AS Country_Code,
+    COUNT(SAMPLE_PK) AS Number_of_Samples
 FROM
     pdp_samples
         JOIN
-    country_code ON pdp_samples.COUNTRY = country_code.`Country Code`;
+    country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
+    GROUP BY 1, 2
+    ORDER BY 3 DESC;
   
 -- Fetch the commodity sample collect from each country
 SELECT DISTINCT
@@ -60,18 +64,7 @@ FROM
     country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
         JOIN
     commodity_code ON pdp_samples.COMMOD = commodity_code.`Commodity Code`
-ORDER BY Country_Name;
-    
--- Count of Samples from each country from highest to lowest
-SELECT 
-    `Country Name` AS Country_Name,
-    COUNT(COUNTRY) AS Number_of_Samples
-FROM
-    pdp_samples
-        JOIN
-    country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
-GROUP BY `Country Name`
-ORDER BY Number_of_Samples DESC;
+ORDER BY 1;
 
 -- Fetch the total number of distinct countries samples was gotten from
 SELECT 
@@ -123,7 +116,8 @@ ORDER BY Number_of_Results DESC;
 
 -- Commodities with test results 
 SELECT DISTINCT
-    `COMMODITY NAME`, COUNT(*) AS Samples
+    `COMMODITY NAME`, 
+    COUNT(*) AS Samples
 FROM
     pdp_results
         LEFT JOIN
@@ -135,11 +129,13 @@ ORDER BY Samples DESC;
 SELECT DISTINCT
     `COMMODITY NAME`, COUNT(*) AS Samples
 FROM
-    pdp_samples
+    pdp_samples p
         LEFT JOIN
-    commodity_code ON commodity_code.`Commodity Code` = pdp_samples.COMMOD
+    commodity_code c ON c.`Commodity Code` = p.COMMOD
+		LEFT JOIN
+	pdp_results r ON c.`Commodity Code` = r.COMMOD
 WHERE
-    `COMMODITY NAME` NOT IN ('Broccoli' , 'Blueberries, Cultivated', 'Butter')
+    c.`Commodity Code` NOT IN (r.COMMOD)
 GROUP BY `COMMODITY NAME`
 ORDER BY Samples DESC;
     
@@ -366,14 +362,70 @@ FROM pdp_results LEFT JOIN commodity_code ON pdp_results.COMMOD = commodity_code
 		ORDER BY lab_name, Total_Per_Commodity DESC ;
             
 -- Fetch the commodity type of each commodity with test results
+SELECT 
+    `Commodity Name`,
+    COMMTYPE AS Commodity_Type,
+    COUNT(`Commodity Name`) AS Number_of_Test
+FROM
+    pdp_results p
+        LEFT JOIN
+    commodity_code c ON p.COMMOD = c.`Commodity Code`
+GROUP BY 1 , 2
+ORDER BY 2 , 3 DESC
+;
 
 -- Fetch the most common confirmation methods used by each lab
+SELECT DISTINCT
+    `Lab Agency Name` AS lab_Name,
+    `Lab City/State` AS Location,
+    `Confirmation Method`,
+    COUNT(`Confirmation Method`) AS Amount_of_tests
+FROM
+    pdp_results p
+        LEFT JOIN
+    commodity_code ON p.COMMOD = commodity_code.`Commodity Code`
+        LEFT JOIN
+    lab_code L ON p.LAB = L.`Lab Code`
+        LEFT JOIN
+    confirmation_method_code m ON p.CONFMETHOD = m.`ConfMethod Code`
+WHERE
+    CONFMETHOD IS NOT NULL
+        AND CONFMETHOD2 IS NOT NULL
+GROUP BY 1 , 2 , 3
+ORDER BY 1 , 4 DESC;
 
 -- fetch the most common determinative methods used by each lab
+SELECT DISTINCT
+    `Lab Agency Name` AS lab_Name,
+    `Lab City/State` AS Location,
+    `Determinative Method`,
+    COUNT(`Determinative Method`) AS Amount_of_tests
+FROM
+    pdp_results p
+        LEFT JOIN
+    commodity_code ON p.COMMOD = commodity_code.`Commodity Code`
+        LEFT JOIN
+    lab_code L ON p.LAB = L.`Lab Code`
+        LEFT JOIN
+    determinative_method_code d ON p.DETERMIN = d.`Determin Code`
+WHERE
+    DETERMIN IS NOT NULL
+GROUP BY 1 , 2 , 3
+ORDER BY 1 , 4 DESC;
 
 -- Fetch the origin of each test sample
-
--- Fetch the first date and last date of test results 
+SELECT DISTINCT
+     C.`Commodity Name`,
+    `Origin of Sample`,
+    COUNT(`Origin of Sample`) AS Number_of_Samples
+FROM
+    pdp_samples R
+        LEFT JOIN
+    commodity_code C ON R.COMMOD = C.`Commodity Code`
+		LEFT JOIN
+	origin_code o ON o.`Origin Code` = R.ORIGIN
+    GROUP BY 1,2 
+    ;
 
 -- SOME DATA CLEANING OPERATIONS
 
