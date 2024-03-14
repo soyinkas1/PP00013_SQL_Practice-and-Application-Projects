@@ -245,3 +245,81 @@ WHERE kind_of_business in ('Men''s clothing stores', 'Women''s clothing stores')
 ORDER BY 2, 1
 ;
 
+-- Indexing to see Percen Change over Time
+  -- Get index reference (first year sales)
+SELECT 
+	sales_year,
+	sales,
+	FIRST_VALUE(sales) OVER (ORDER BY sales_year) as index_sales
+FROM 
+( 
+	SELECT date_part('year', sales_month) as sales_year,
+	SUM(sales) as sales
+	FROM retail_sales
+	WHERE kind_of_business = 'Women''s clothing stores'
+	GROUP BY 1
+) a
+;
+-- Update to find percent change from the index year
+SELECT
+	sales_year,
+	sales,
+	(sales / FIRST_VALUE(sales) OVER (ORDER BY sales_year) - 1) * 100 as pct_from_index
+FROM
+(
+	SELECT date_part('year', sales_month) as sales_year,
+	SUM(sales) as sales
+	FROM retail_sales
+	WHERE kind_of_business = 'Women''s clothing stores'
+	GROUP BY 1
+) a
+;
+
+-- Window functions provide a lot of flexibility. Indexing can be accomplished without
+-- them through a series of self-JOINs, though more lines of code are required:
+SELECT 
+	sales_year, 
+	sales,
+	(sales / index_sales - 1) * 100 as pct_from_index
+FROM
+(
+	SELECT date_part('year',aa.sales_month) as sales_year, bb.index_sales, sum(aa.sales) as sales
+	FROM retail_sales aa
+	JOIN
+		(
+			SELECT first_year, sum(a.sales) as index_sales
+			FROM retail_sales a
+			JOIN
+				(
+					SELECT min(date_part('year',sales_month)) as first_year
+					FROM retail_sales
+					WHERE kind_of_business = 'Women''s clothing stores'
+				) b on date_part('year',a.sales_month) = b.first_year
+			WHERE a.kind_of_business = 'Women''s clothing stores'
+			GROUP BY 1
+		) bb on 1 = 1
+		WHERE aa.kind_of_business = 'Women''s clothing stores'
+		GROUP BY 1,2
+) aaa
+ORDER BY 1
+;
+
+-- Indexed Time Series for Men's and Women's clothing store
+SELECT  
+	sales_year,
+	kind_of_business,
+	sales,
+	(sales / FIRST_VALUE(sales) OVER (PARTITION BY kind_of_business ORDER BY sales_year) - 1) * 100 as pct_from_index
+FROM
+(
+	SELECT date_part('year', sales_month) as sales_year,
+	
+	kind_of_business,
+	SUM(sales) as sales
+	FROM retail_sales
+	WHERE kind_of_business in ('Men''s clothing stores',
+							  'Women''s clothing stores')
+	and sales_month <= '2019-12-31'
+	GROUP BY 1, 2
+)a
+;
