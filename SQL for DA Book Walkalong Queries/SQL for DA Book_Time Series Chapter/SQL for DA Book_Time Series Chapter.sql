@@ -365,4 +365,63 @@ SELECT
 FROM retail_sales
 WHERE kind_of_business = 'Women''s clothing stores'
 ;
-	
+
+-- Cummulative values (MTD, YTD)
+	-- window function
+SELECT
+	sales_month,
+	sales,
+	sum(sales) OVER (PARTITION BY date_part('year', sales_month) ORDER BY sales_month) as sales_ytd
+FROM retail_sales
+WHERE kind_of_business = 'Women''s clothing stores'
+;
+	-- Self-Joins
+SELECT 
+	a.sales_month, a.sales,
+	sum(b.sales) as sales_ytd
+FROM retail_sales a
+JOIN retail_sales b ON
+	date_part('year', a.sales_month) = date_part('year', b.sales_month)
+	and b.sales_month <= a.sales_month
+	and b.kind_of_business = 'Women''s clothing stores'
+WHERE a.kind_of_business = 'Women''s clothing stores'
+GROUP BY 1, 2
+;
+
+-- Seasonality - MoM, YoY
+SELECT 
+	kind_of_business,
+	sales_month,
+	sales,
+	lag(sales_month) over (partition by kind_of_business 
+						  order by sales_month) as prev_month,
+	lag(sales) over (partition by kind_of_business
+					 order by sales_month) as prev_month_sales
+FROM retail_sales
+WHERE kind_of_business = 'Book stores'
+;
+
+-- Percent Change from previous MoM
+SELECT
+	kind_of_business,
+	sales_month,
+	sales,
+	(sales / lag(sales) over (partition by kind_of_business
+							 order by sales_month) - 1) * 100 as pct_growth_from_previous
+FROM retail_sales
+WHERE kind_of_business = 'Book stores'
+;
+-- Percent Change from previous YoY
+SELECT
+	sales_year,
+	yearly_sales,
+	lag(yearly_sales) over (order by sales_year) as prev_year_sales,
+	(yearly_sales / lag(yearly_sales) over (order by sales_year) - 1) * 100 as pct_growth_from_prev_year
+	FROM
+	(
+		SELECT date_part('year', sales_month) as sales_year, sum(sales) as yearly_sales
+		FROM retail_sales
+		WHERE kind_of_business = 'Book stores'
+		GROUP BY 1
+	) a
+	;
