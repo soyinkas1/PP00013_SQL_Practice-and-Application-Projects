@@ -323,3 +323,46 @@ FROM
 	GROUP BY 1, 2
 )a
 ;
+
+-- Rolling Windows
+-- window of 12 months to get rolling annual sales, since the data is at a monthly level of granularity.
+SELECT 
+	a.sales_month,
+	a.sales,
+	b.sales_month as rolling_sales_month,
+	b.sales as rolling_sales
+FROM retail_sales a
+JOIN retail_sales b ON a.kind_of_business = b.kind_of_business
+	and b.sales_month between a.sales_month - interval '11 months'
+	and a.sales_month
+	and b.kind_of_business = 'Women''s clothing stores'
+WHERE a.kind_of_business = 'Women''s clothing stores'
+and a.sales_month = '2019-12-01'
+;
+
+-- Moving Average with Self-Joins
+SELECT 
+	a.sales_month,
+	a.sales,
+	avg(b.sales) as moving_avg,
+	count(b.sales) as records_count
+FROM retail_sales a
+JOIN retail_sales b on a.kind_of_business = b.kind_of_business
+	and b.sales_month between a.sales_month - interval '11 months'
+	and a.sales_month
+	and b.kind_of_business = 'Women''s clothing stores'
+WHERE a.kind_of_business = 'Women''s clothing stores'
+and a.sales_month >= '1993-01-01'
+GROUP BY 1, 2
+ORDER BY 1
+;
+
+-- Calculate Moving Average with window function
+SELECT 
+	sales_month,
+	avg(sales) OVER (ORDER BY sales_month rows between 11 preceding and current row) as moving_avg,
+	count(sales) OVER( ORDER BY sales_month rows between 11 preceding and current row) as records_count
+FROM retail_sales
+WHERE kind_of_business = 'Women''s clothing stores'
+;
+	
