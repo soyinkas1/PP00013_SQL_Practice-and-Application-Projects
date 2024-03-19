@@ -1,15 +1,8 @@
 -- COPY `annotate code`
--- FROM 'D:\OneDrive\Documents\PERSONAL\PERSONAL DEVELOPMENT\DATA SCIENCE\SQL\PP00013_SQL CPD Projects\PDP Database SQL Analysis_CPD Projects_01\data\Annotate Code_PDP ReferenceTables 2021-17.csv' -- change to the location you saved the csv file
+-- FROM 'D:\OneDrive\Documents\PERSONAL\PERSONAL DEVELOPMENT\DATA SCIENCE\SQL\PP00013_SQL CPD Projects\PDP Database SQL Analysis_CPD Projects_01\data\Annotate Code_PDP ReferenceTables 2021-17.csv' 
 -- DELIMITER ',';
 
--- LOAD DATA 
--- INFILE "D:\\OneDrive\\Documents\\Personal Project Portfolio\\PP00013_SQL CPD Projects\\PDP Database SQL Analysis_CPD Projects_01\\data\\pdp_results_c.csv"
--- REPLACE
--- INTO TABLE pdp_results
--- FIELDS TERMINATED BY ','
--- IGNORE 1 ROWS;
-
--- View all the tables
+-- Explore all the tables in the database
 -- 1. annotate code table
 SELECT 
     *
@@ -91,16 +84,19 @@ SELECT
 FROM
     test_class_code;
 
+-- Fetch the number of samples tested
 SELECT 
     COUNT(*) AS number_of_samples
 FROM
     pdp_samples;/*10,127 */
 
+-- Fetch the number of results
 SELECT 
     COUNT(*) AS number_of_results
 FROM
     pdp_results;/* 2,737,933 */
 
+-- fetch the top 5 rows of all columns in the s table 
 SELECT 
     *
 FROM
@@ -122,15 +118,15 @@ FROM
 
 -- Fetch the distint countries from which samples was collected and number of samples
 SELECT DISTINCT
-    `Country Name` AS Country_Name, 
+    `Country Name` AS Country_Name,
     COUNTRY AS Country_Code,
     COUNT(SAMPLE_PK) AS Number_of_Samples
 FROM
     pdp_samples
         JOIN
     country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
-    GROUP BY 1, 2
-    ORDER BY 3 DESC;
+GROUP BY 1 , 2
+ORDER BY 3 DESC;
   
 -- Fetch the commodity sample collect from each country
 SELECT DISTINCT
@@ -195,8 +191,7 @@ ORDER BY Number_of_Results DESC;
 
 -- Commodities with test results 
 SELECT DISTINCT
-    `COMMODITY NAME`, 
-    COUNT(*) AS Samples
+    `COMMODITY NAME`, COUNT(*) AS Samples
 FROM
     pdp_results
         LEFT JOIN
@@ -211,8 +206,8 @@ FROM
     pdp_samples p
         LEFT JOIN
     commodity_code c ON c.`Commodity Code` = p.COMMOD
-		LEFT JOIN
-	pdp_results r ON c.`Commodity Code` = r.COMMOD
+        LEFT JOIN
+    pdp_results r ON c.`Commodity Code` = r.COMMOD
 WHERE
     c.`Commodity Code` NOT IN (r.COMMOD)
 GROUP BY `COMMODITY NAME`
@@ -412,25 +407,24 @@ ORDER BY 1 , 4 DESC;
 
 -- Fetch the origin of each test sample
 SELECT DISTINCT
-     C.`Commodity Name`,
+    C.`Commodity Name`,
     `Origin of Sample`,
     COUNT(`Origin of Sample`) AS Number_of_Samples
 FROM
     pdp_samples R
         LEFT JOIN
     commodity_code C ON R.COMMOD = C.`Commodity Code`
-		LEFT JOIN
-	origin_code o ON o.`Origin Code` = R.ORIGIN
-    GROUP BY 1,2 
-    ;
-
--- SOME DATA CLEANING OPERATIONS
-
--- Remove unneeded columns in pdp_test
-
--- Remove samples without COUNTRY
-
--- Remove missing values in LOD
+        LEFT JOIN
+    origin_code o ON o.`Origin Code` = R.ORIGIN
+GROUP BY 1 , 2
+;
+-- Fetch samples without COUNTRY
+SELECT 
+    *
+FROM
+    pdp_samples
+WHERE
+    COUNTRY IN ('');
 
 
 
