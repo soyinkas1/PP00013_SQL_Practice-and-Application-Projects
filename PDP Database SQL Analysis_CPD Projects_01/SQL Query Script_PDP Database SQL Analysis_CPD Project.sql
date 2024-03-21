@@ -89,12 +89,28 @@ SELECT
     COUNT(*) AS number_of_samples
 FROM
     pdp_samples;/*10,127 */
+    
+-- Fetch the number of distinct samples that results was collected 
+SELECT 
+    COUNT(DISTINCT SAMPLE_PK) AS Samples_with_result
+FROM
+    pdp_results; /*10,127 */
 
 -- Fetch the number of results
 SELECT 
     COUNT(*) AS number_of_results
 FROM
     pdp_results;/* 2,737,933 */
+
+-- Fetch the numer of tests/results per sample
+SELECT 
+	s.SAMPLE_PK as Sample,
+    COUNT(r.SAMPLE_PK) as results
+FROM pdp_samples s
+JOIN pdp_results r 
+ON s.SAMPLE_PK = r.SAMPLE_PK
+GROUP BY s.SAMPLE_PK;
+
 
 -- fetch the top 5 rows of all columns in the s table 
 SELECT 
@@ -110,11 +126,7 @@ FROM
     pdp_results
 LIMIT 5;
 
--- Fetch the number of distinct samples that results was collected 
-SELECT 
-    COUNT(DISTINCT SAMPLE_PK) AS Samples_with_result
-FROM
-    pdp_results;
+
 
 -- Fetch the distint countries from which samples was collected and number of samples
 SELECT DISTINCT
