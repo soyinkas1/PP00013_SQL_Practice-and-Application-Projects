@@ -102,17 +102,17 @@ SELECT
 FROM
     pdp_results;/* 2,737,933 */
 
--- Fetch the numer of tests/results per sample
+-- Fetch the number of tests/results per sample
 SELECT 
 	s.SAMPLE_PK as Sample,
+    `Commodity Name` AS Commodity_Name,
     COUNT(r.SAMPLE_PK) as results
 FROM pdp_samples s
-JOIN pdp_results r 
-ON s.SAMPLE_PK = r.SAMPLE_PK
-GROUP BY s.SAMPLE_PK;
+JOIN pdp_results r ON s.SAMPLE_PK = r.SAMPLE_PK
+	JOIN commodity_code c ON s.COMMOD = c.`Commodity Code`
+GROUP BY 1, 2;
 
-
--- fetch the top 5 rows of all columns in the s table 
+-- fetch the top 5 rows of all columns in the samples table 
 SELECT 
     *
 FROM
@@ -126,8 +126,6 @@ FROM
     pdp_results
 LIMIT 5;
 
-
-
 -- Fetch the distint countries from which samples was collected and number of samples
 SELECT DISTINCT
     `Country Name` AS Country_Name,
@@ -140,7 +138,7 @@ FROM
 GROUP BY 1 , 2
 ORDER BY 3 DESC;
   
--- Fetch the commodity sample collect from each country
+-- Fetch the commodity sample collected from each country
 SELECT DISTINCT
     `Country Name` AS Country_Name,
     COUNTRY AS Country_Code,
@@ -201,9 +199,10 @@ FROM
 GROUP BY `Country Name`
 ORDER BY Number_of_Results DESC;
 
--- Commodities with test results 
+-- Each Commodity with number of test results 
 SELECT DISTINCT
-    `COMMODITY NAME`, COUNT(*) AS Samples
+    `COMMODITY NAME`, 
+    COUNT(*) AS Samples
 FROM
     pdp_results
         LEFT JOIN
@@ -231,7 +230,7 @@ SELECT DISTINCT
 FROM
     pdp_results;
 
--- Fetch the top 10 samples with the highest Limit of Detection (LOD)
+-- Fetch the top 100 samples with the highest Limit of Detection (LOD)
 SELECT DISTINCT
     R.SAMPLE_PK, C.`Commodity Name`, R.LOD AS LOD
 FROM
@@ -282,7 +281,7 @@ ORDER BY C.`Commodity Name` , Maximum_LOD DESC;
 
 -- Fetch how many test that did not detect any residue
 SELECT 
-    MEAN, SAMPLE_PK
+    count(SAMPLE_PK)
 FROM
     pdp_results
 WHERE
@@ -291,24 +290,26 @@ WHERE
 
 -- Fetch test that detected pesticide residue
 SELECT 
-    MEAN, SAMPLE_PK
+   count(SAMPLE_PK)
 FROM
     pdp_results
 WHERE
     MEAN NOT IN ('ND' , 'NP')
 ;
 
--- Fetch test that detected pesticide residue for each commodity
+-- Fetch number of tests that detected pesticide residue for each commodity
 SELECT 
-    C.`Commodity Name`, COUNT(SAMPLE_PK) AS Number_of_Detection
+    C.`Commodity Name`, 
+    COUNT(SAMPLE_PK) AS number_of_detection,
+    SUM(COUNT(SAMPLE_PK)) OVER (ORDER BY C.`Commodity Name`) AS running_total_Detection
 FROM
     pdp_results T
         JOIN
     commodity_code C ON T.COMMOD = C.`Commodity Code`
 WHERE
     MEAN NOT IN ('ND' , 'NP')
-GROUP BY C.`Commodity Name`
-ORDER BY 2
+GROUP BY 1 
+ORDER BY 1, 2 
 ;
 
 -- Calculate percentage of the results that detected pesticide residue per commodity
