@@ -8,16 +8,19 @@ SELECT
     *
 FROM
     `annotate code`;
--- 2. commodity_code table
-SELECT 
-    *
-FROM
-    commodity_code;
--- 3. commodity_type_code table
+    
+-- 2. commodity_type_code table
 SELECT 
     *
 FROM
     commodity_type_code;
+    
+-- 3. commodity_code table
+SELECT 
+    *
+FROM
+    commodity_code;
+
 -- 4. concentration-iod_unit_code table
 SELECT 
     *
@@ -160,17 +163,7 @@ FROM
     country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
         JOIN
     pdp_results ON pdp_samples.SAMPLE_PK = pdp_results.SAMPLE_PK;
-
--- Fetch the distint countries from which test results was gotten
-SELECT DISTINCT
-    `Country Name` AS Country_Name
-FROM
-    pdp_samples
-        JOIN
-    country_code ON pdp_samples.COUNTRY = country_code.`Country Code`
-        JOIN
-    pdp_results ON pdp_samples.SAMPLE_PK = pdp_results.SAMPLE_PK;
-  
+ 
 -- Fetch the commodity results collect from each country
 SELECT DISTINCT
     `Country Name` AS Country_Name,
@@ -240,7 +233,7 @@ FROM
 ORDER BY LOD DESC
 LIMIT 100;
     
--- Which pesticide has the highest highest Limit of Detection (LOD) per commodity
+-- Which pesticide has the highest Limit of Detection (LOD) per commodity
 SELECT DISTINCT
     C.`Commodity Name`, P.`Pesticide Name`, T.LOD
 FROM
