@@ -74,7 +74,7 @@ GROUP BY 1;
 -- Example: Aggregating sales by region and month with ROLLUP
 -- SELECT region, MONTH(order_date) as MONTH, SUM(total_sales) as monthly_sales
 -- FROM sales
--- GROUP BY ROLLUP(region, MONTH(order_date));
+-- GROUP BY ROLLUP(region, MONTH(order_date));;
 
 
 
